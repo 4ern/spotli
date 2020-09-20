@@ -1,16 +1,8 @@
 <template>
   <div class="spotli" @keyup.enter="openBookmark">
-    <searchbar v-model="searchInput" :info="searchResults.length" />
-    <results-list
-        ref="resultsList"
-        :search-results="searchResults"
-        :search-input="searchInput"
-        @selected="selectedItem"
-        @deleteTag="deleteTag"
-        @newTag="addNewTag"
-        @openBookmark="openBookmark"
-        @deleteBookmark="deleteBookmark"
-    />
+    <button @click="optionPage">test</button>
+<!--    <searchbar />-->
+<!--    <results-list ref="resultsList" />-->
   </div>
 </template>
 
@@ -26,162 +18,75 @@ export default {
 
   data() {
     return {
-      searchInput: '',
-      selected: undefined,
-      bookmarks: [],
       searchResults: [],
       searchBarInfo: ''
     };
   },
 
-  mounted() {
-    chrome.storage.local.get(['spotli_bookmarks'], (res) => {
-      this.bookmarks = res['spotli_bookmarks'];
-    });
+  created() {
+    this.$store.dispatch('loadBookmarks');
+  },
+
+  computed: {
+    bookmarks() {
+      return this.$store.state.bookmarks;
+    },
+
+    searchInput() {
+      return this.$store.state.searchInput;
+    },
+
+    open() {
+      return this.$store.state.open;
+    }
   },
 
   watch: {
-    searchInput(newInput) {
-      if (newInput.length >= 2) {
-        this.searchBookmarks();
-      } else {
-        this.searchResults = [];
-      }
+    searchInput() {
+      this.$store.dispatch('search');
+    },
+
+    open() {
+      if (this.open) this.openBookmark()
+    },
+
+    bookmarks() {
+      this.$store.commit('saveBookmarks');
     }
   },
 
   methods: {
 
-    selectedItem(index) {
-      this.selected = this.searchResults[index];
-    },
+    async openBookmark() {
+      let url = this.$store.state.selected === null ? null : this.$store.state.selected.url;
+      const selected = this.$store.state.selected;
+      const searchResult = this.$store.state.searchResults;
 
-    /**
-     * Tags
-     */
-
-    addNewTag(payload) {
-      const newBookmarks = this.bookmarks.map((bookmark) => {
-        if (bookmark.id === payload.id) {
-          let hasTag = bookmark.tag.find((tag) => tag === payload.tag);
-          if (!hasTag) {
-            bookmark.tag.push(payload.tag);
-          }
-        }
-        return bookmark;
-      })
-      this.saveBookmarks(newBookmarks);
-    },
-
-    deleteTag(payload) {
-      const newBookmarks = this.bookmarks.map((bm) => {
-        if (bm.id === payload.id) {
-          let index = bm.tag.findIndex((tag) => tag === payload.tag);
-          if (index > -1) {
-            bm.tag.splice(index, 1);
-          }
-        }
-        return bm;
-      })
-      this.saveBookmarks(newBookmarks);
-    },
-
-    /**
-     * Bookmarks
-     */
-
-    saveBookmarks(bookmarks) {
-      console.log(bookmarks)
-      this.bookmarks = bookmarks;
-      chrome.storage.local.remove('spotli_bookmarks');
-      chrome.storage.local.set({'spotli_bookmarks': bookmarks});
-    },
-
-    searchBookmarks() {
-
-      if (this.searchInput.startsWith(':')) {
-        if (this.searchInput.startsWith(':tag')) {
-          return this.searchResults = this.bookmarks.filter((bookmark) => {
-            let search = this.searchInput.replace(':tag', '').trim().toLocaleLowerCase();
-            let hasTag = bookmark.tag.find((tag) => {
-              if (search.length === 0) return false;
-              return tag.toLowerCase().includes(search)
-            });
-            return !!hasTag;
-          });
-        }
-
-        if (this.searchInput.startsWith(':url')) {
-          return this.searchResults = this.bookmarks.filter((bookmark) => {
-            const search = this.searchInput.replace(':url', '').trim().toLocaleLowerCase();
-            const url = bookmark.url.toLocaleLowerCase().trim()
-            return search.length < 3 ? false : !!url.includes(search);
-          });
-        }
-
-        if (this.searchInput.startsWith(':title')) {
-          return this.searchResults = this.bookmarks.filter((bookmark) => {
-            const search = this.searchInput.replace(':title', '').trim().toLocaleLowerCase();
-            const title = bookmark.title.toLocaleLowerCase().trim()
-            return search.length < 3 ? false : !!title.includes(search);
-          });
-        }
-
-      } else {
-
-        const search = this.searchInput.toLowerCase().trim();
-
-        let titleResults = this.bookmarks.filter((bookmark) => bookmark.title.includes(search));
-        let tagResults = this.bookmarks.filter((bookmark) => {
-          let hasTag = bookmark.tag.find((tag) => tag.toLowerCase() === search);
-          return !!hasTag;
-        })
-        let urlResults= this.bookmarks.filter((bookmark) => {
-          const search = this.searchInput.replace(':url', '').trim().toLocaleLowerCase();
-          const url = bookmark.url.toLocaleLowerCase().trim()
-          return search.length < 3 ? false : !!url.includes(search);
-        });
-
-        this.searchResults = [...titleResults, ...tagResults, ...urlResults].reduce((acc, current) => {
-          const x = acc.find(item => item.id === current.id);
-          return !x ? acc.concat([current]) : acc;
-        }, []);
-
+      /**
+       * search in google
+       */
+      if (selected === null && searchResult.length === 0) {
+        url = encodeURI(`https://www.google.com/search?q=${this.searchInput}`);
       }
-    },
 
-    deleteBookmark(id) {
-      this.bookmarks = this.bookmarks.filter((bookmark) => bookmark.id !== id);
-      this.searchResults = this.searchResults.filter((bookmark) => bookmark.id !== id);
-    },
+      /**
+       * enter without selection
+       */
 
-    /**
-     * chrome tabs
-     */
-
-    async openBookmark(url) {
-
-      let selectedUrl;
-
-      if (typeof url === 'string') {
-        selectedUrl = url;
-      } else if (this.searchResults.length === 0) {
-        selectedUrl = encodeURI(`https://www.google.com/search?q=${this.searchInput}`);
-      } else {
-        if (typeof this.selected === 'undefined') this.selected = this.searchResults[0];
-        selectedUrl = this.selected.url
+      if (selected === null && searchResult.length !== 0) {
+        url = searchResult[0].url;
       }
 
       /**
        * reopen tab if its exists
        */
-      const reOpenTab = await this.reOpen(selectedUrl);
-      if (reOpenTab) return;
+      if (await this.reOpen(url)) return;
 
       /**
        * open new tab
        */
-      chrome.tabs.create({ url: selectedUrl });
+      chrome.tabs.create({ url: url });
+
     },
 
     /**
@@ -197,8 +102,15 @@ export default {
           resolve(false);
         });
       })
-    }
+    },
 
+    optionPage() {
+      if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        window.open(chrome.runtime.getURL('options.html'));
+      }
+    }
   },
 }
 </script>

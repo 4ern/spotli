@@ -1,9 +1,9 @@
 <template>
-  <div @click.stop="" class="tags">
+  <div @click.stop="" class="tags" @keydown.tab="addSecondTag">
 
     <div class="tag"
-         v-for="tag in tags"
-         :class="{ active: tag.toLowerCase().trim().includes(isSearchTag(searchInput)) }"
+         v-for="tag in bookmark.tag"
+         :class="{ active: isSearchTag(tag) }"
          :key="tag">
       {{ tag }}
       <button @click.stop="deleteTag(tag)" class="delete">x</button>
@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  props: ['tags', 'searchInput'],
+  props: ['bookmark'],
 
   data() {
     return {
@@ -35,28 +35,40 @@ export default {
     };
   },
 
+  computed: {
+    searchInput() {
+      return this.$store.state.searchInput;
+    }
+  },
+
   methods: {
     addTag() {
       this.showInput = true;
       setTimeout(() => this.$refs.addTagInput.focus(), 100)
     },
 
+    addSecondTag() {
+      this.saveTag();
+      this.addTag();
+    },
+
     deleteTag(tag) {
-      this.$emit('deleteTag', tag)
+      this.$store.commit('deleteTag', {bookmark: this.bookmark, tag: tag})
     },
 
     saveTag() {
       if (this.tag.length >= 3) {
-        this.$emit('newTag', this.tag);
+        this.$store.commit('addNewTag', {bookmark: this.bookmark, tag: this.tag})
         this.tag = '';
       }
       this.showInput = false;
     },
 
     isSearchTag(tag) {
-      let searchTag = tag.replace(':tag', '').trim();
-      searchTag = searchTag.replace(':title', '').trim();
-      return searchTag.replace(':url', '').trim();
+      let input = this.searchInput.replace(':tag', '').trim();
+      input = input.replace(':title', '').trim();
+      input = input.replace(':url', '').trim();
+      return tag.toLowerCase().trim().includes(input);
     }
   }
 }

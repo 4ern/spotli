@@ -3,11 +3,11 @@
     <div class="searchbar">
       <img src="/images/search.svg" alt="search-icon"/>
       <input
-          v-model="input"
-          @input="$emit('input', input)"
+          :value="searchInput"
+          @input="updateSearchInput"
           type="text"
           autofocus/>
-      <span>{{ info }} results</span>
+      <span>{{ searchResults.length }} results</span>
     </div>
   </div>
 </template>
@@ -15,13 +15,21 @@
 <script>
 export default {
   name: "searchbar",
-  props: ["value", 'info'],
-  emits: ["input"],
 
-  data() {
-    return {
-      input: ""
-    };
+  computed: {
+    searchInput() {
+      return this.$store.state.searchInput;
+    },
+
+    searchResults() {
+      return this.$store.state.searchResults;
+    }
+  },
+
+  methods: {
+    updateSearchInput(e) {
+      this.$store.commit('updateSearchInput', e.target.value)
+    }
   }
 };
 </script>
