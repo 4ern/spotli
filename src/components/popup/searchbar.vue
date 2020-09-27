@@ -1,12 +1,15 @@
 <template>
   <div class="searchbar-wrapper">
     <div class="searchbar">
-      <img src="/images/search.svg" alt="search-icon"/>
+      <v-icon large style="padding: 0 8px;">search</v-icon>
+
       <input
-          :value="searchInput"
-          @input="updateSearchInput"
-          type="text"
-          autofocus/>
+        :value="searchInput"
+        @input="updateSearchInput"
+        type="text"
+        autofocus
+        @keyup.enter="open"
+      />
       <span>{{ searchResults.length }} results</span>
     </div>
   </div>
@@ -28,14 +31,17 @@ export default {
 
   methods: {
     updateSearchInput(e) {
-      this.$store.commit('updateSearchInput', e.target.value)
+      this.$store.commit("updateSearchInput", e.target.value);
+    },
+
+    open() {
+      this.$emit('open')
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-
 .searchbar-wrapper {
   position: fixed;
   width: 100%;
@@ -71,7 +77,7 @@ export default {
       display: flex;
       margin-right: 16px;
       border-radius: 50%;
-      color: #94949E;
+      color: #94949e;
     }
   }
 }

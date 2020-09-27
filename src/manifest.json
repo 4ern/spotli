@@ -29,10 +29,7 @@
       "38": "icons/38.png"
     }
   },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
-  },
+  "options_page": "options.html",
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {

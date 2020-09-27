@@ -1,9 +1,8 @@
 <template>
-  <div class="spotli" @keyup.enter="openBookmark">
-    <button @click="optionPage">test</button>
-<!--    <searchbar />-->
-<!--    <results-list ref="resultsList" />-->
-  </div>
+  <v-app class="spotli">
+    <searchbar @open="openBookmark"/>
+    <results-list ref="resultsList" @open="openBookmark"/>
+  </v-app>
 </template>
 
 <script>
@@ -19,12 +18,13 @@ export default {
   data() {
     return {
       searchResults: [],
-      searchBarInfo: ''
+      searchBarInfo: ""
     };
   },
 
   created() {
-    this.$store.dispatch('loadBookmarks');
+    this.$store.dispatch("loadBookmarks");
+    this.$store.dispatch(("loadSettings"));
   },
 
   computed: {
@@ -43,36 +43,47 @@ export default {
 
   watch: {
     searchInput() {
-      this.$store.dispatch('search');
+      this.$store.dispatch("search");
     },
 
     open() {
-      if (this.open) this.openBookmark()
+      if (this.open) this.openBookmark();
     },
 
     bookmarks() {
-      this.$store.commit('saveBookmarks');
+      this.$store.commit("saveBookmarks");
     }
   },
 
   methods: {
-
     async openBookmark() {
-      let url = this.$store.state.selected === null ? null : this.$store.state.selected.url;
+
+      /**
+       * abort if empts
+       */
+      if (this.searchInput.length < 3) return;
+
+      let url =
+        this.$store.state.selected === null
+          ? null
+          : this.$store.state.selected.url;
       const selected = this.$store.state.selected;
       const searchResult = this.$store.state.searchResults;
 
       /**
        * search in google
        */
-      if (selected === null && searchResult.length === 0) {
-        url = encodeURI(`https://www.google.com/search?q=${this.searchInput}`);
+      if (this.$store.state.settings.autoGoogle) {
+        if ( (selected === null && searchResult.length === 0 ) || this.open === ':g') {
+          url = encodeURI(`https://www.google.com/search?q=${this.searchInput.replace(':g', '').trim()}`);
+          this.$store.commit('updateOpenBookmark', false)
+          return chrome.tabs.create({ url: url });
+        }
       }
 
       /**
        * enter without selection
        */
-
       if (selected === null && searchResult.length !== 0) {
         url = searchResult[0].url;
       }
@@ -80,43 +91,41 @@ export default {
       /**
        * reopen tab if its exists
        */
-      if (await this.reOpen(url)) return;
+      if (this.$store.state.settings.focusTab) {
+        if (await this.reOpen(url)) return;
+      }
 
       /**
        * open new tab
        */
-      chrome.tabs.create({ url: url });
-
+      if (url !== null) {
+        chrome.tabs.create({ url: url });
+      }
+      this.$store.commit('updateOpenBookmark', false)
     },
 
     /**
      * Todo: Make optional
      */
     reOpen(url) {
-      return new Promise((resolve) => {
-        chrome.tabs.query({url: url, active: false }, (resp) => {
+      return new Promise(resolve => {
+        chrome.tabs.query({ url: url, active: false }, resp => {
           if (resp.length > 0) {
-            chrome.tabs.update(resp[0].id, {active: true})
-            resolve(true)
+            chrome.tabs.update(resp[0].id, { active: true });
+            resolve(true);
           }
           resolve(false);
         });
-      })
-    },
-
-    optionPage() {
-      if (chrome.runtime.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-      } else {
-        window.open(chrome.runtime.getURL('options.html'));
-      }
+      });
     }
-  },
-}
+  }
+};
 </script>
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,800;1,300;1,400;1,600;1,800&display=swap");
+@import "https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css";
+@import "https://fonts.googleapis.com/css?family=Material+Icons";
 
 html {
   width: 600px;
@@ -130,14 +139,13 @@ body {
 }
 
 .spotli {
-  display: flex;
-  flex-flow: column;
-  min-height: 56px;
-
-  button {
-    &:focus {
-      outline: none;
-    }
+  .v-application--wrap {
+    min-height: 56px;
   }
+
+}
+
+.v-application ul, .v-application ol {
+  padding-left: 0;
 }
 </style>

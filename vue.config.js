@@ -9,7 +9,7 @@ module.exports = {
       template: "public/browser-extension.html",
       entry: "./src/options/main.js",
       title: "Options"
-    },
+    }
   },
   pluginOptions: {
     browserExtension: {
@@ -19,5 +19,6 @@ module.exports = {
         }
       }
     }
-  }
+  },
+  transpileDependencies: ["vuetify"]
 };

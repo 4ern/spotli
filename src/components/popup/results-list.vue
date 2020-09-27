@@ -1,21 +1,20 @@
 <template>
-  <ul v-if="searchResults.length !== 0" class="search-results">
+  <ul v-if="searchResults.length !== 0" class="search-results" @keyup.enter="open">
     <li
       v-for="(item, index) in searchResults"
       :key="item.url"
       :class="{ 'active-item': currentItem === index }"
-      @click="clickOnItem(item)" >
-        <list-item :bookmark="item" />
+      @click="clickOnItem(item)"
+    >
+      <list-item :bookmark="item" />
     </li>
   </ul>
 </template>
 
 <script>
-
 import listItem from "./result-list-item";
 
 export default {
-
   components: {
     listItem
   },
@@ -38,19 +37,25 @@ export default {
 
   watch: {
     searchResults() {
-      this.currentItem = 0
+      this.currentItem = 0;
     }
   },
 
   methods: {
     nextItem() {
-      if ((event.keyCode === 40) && this.currentItem === this.searchResults.length - 1) {
-        return this.currentItem = 0;
+      if (
+        event.keyCode === 40 &&
+        this.currentItem === this.searchResults.length - 1
+      ) {
+        return (this.currentItem = 0);
       }
 
       if (event.keyCode === 38 && this.currentItem > 0) {
         this.currentItem--;
-        this.$store.commit('updateSelectedBookmark', this.searchResults[this.currentItem])
+        this.$store.commit(
+          "updateSelectedBookmark",
+          this.searchResults[this.currentItem]
+        );
       }
 
       if (
@@ -58,14 +63,20 @@ export default {
         this.currentItem < this.searchResults.length - 1
       ) {
         this.currentItem++;
-        this.$store.commit('updateSelectedBookmark', this.searchResults[this.currentItem])
+        this.$store.commit(
+          "updateSelectedBookmark",
+          this.searchResults[this.currentItem]
+        );
       }
-
     },
 
     clickOnItem(item) {
-      this.$store.commit('updateSelectedBookmark', item)
-      this.$store.commit('updateOpenBookmark', true)
+      this.$store.commit("updateSelectedBookmark", item);
+      this.$store.commit("updateOpenBookmark", true);
+    },
+
+    open() {
+      this.$emit('open')
     }
   }
 };
@@ -88,75 +99,52 @@ export default {
       background-color: #009daf;
 
       .url {
-        color: #E2FBFD;
+        color: #e2fbfd;
       }
 
       .delete {
-        color: #E2FBFD;
-        &:hover{
-          color: #FF4E50;
+        color: #e2fbfd;
+        &:hover {
+          color: #ff4e50;
         }
       }
 
       .edit {
-        color: #E2FBFD;
+        color: #e2fbfd;
         &:hover {
           color: #009daf;
         }
       }
 
       .save {
-        color: #E2FBFD;
+        color: #e2fbfd;
         &:hover {
-          color: #00D683;
+          color: #00d683;
         }
       }
 
-      .tags {
-        .delete {
-          color: #94949E;
+      .theme--dark {
+        &.v-chip:not(.v-chip--active) {
+          &.matched {
+            background-color: #007C8A;
+          }
         }
       }
 
-      input, textarea {
-        border: solid 1px #E2FBFD;
-      }
     }
 
     &:hover {
       background-color: #53535f;
 
-      &.active-item {
-        input, textarea {
-          border: solid 1px #009daf;
-        }
-      }
 
-      .tags {
-        .tag {
-          background-color: #303038;
-
-          .delete {
-            &:hover {
-              color: #E2FBFD;
-            }
-          }
-
-          &.active {
-            background-color: #FFCC00;
-            color: #303038;
-
-            .delete {
-              color: #303038;
-              &:hover {
-                color: #E2FBFD;
-              }
-            }
+      .theme--dark {
+        &.v-chip:not(.v-chip--active) {
+          &.nomatch {
+            background-color: #303038;
           }
         }
       }
     }
-
   }
 }
 </style>
