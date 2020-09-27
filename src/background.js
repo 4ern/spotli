@@ -8,6 +8,7 @@ class installBookmarks {
         this.recursiveLoop(tree[0].children);
       });
       this.saveToStorage();
+      window.open(chrome.runtime.getURL("options.html"));
     });
   }
 
