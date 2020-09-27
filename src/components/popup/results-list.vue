@@ -102,24 +102,9 @@ export default {
         color: #e2fbfd;
       }
 
-      .delete {
-        color: #e2fbfd;
-        &:hover {
-          color: #ff4e50;
-        }
-      }
-
-      .edit {
-        color: #e2fbfd;
-        &:hover {
-          color: #009daf;
-        }
-      }
-
-      .save {
-        color: #e2fbfd;
-        &:hover {
-          color: #00d683;
+      .v-input__prepend-inner {
+        .v-icon {
+          color: #e2fbfd;
         }
       }
 
@@ -135,8 +120,6 @@ export default {
 
     &:hover {
       background-color: #53535f;
-
-
       .theme--dark {
         &.v-chip:not(.v-chip--active) {
           &.nomatch {

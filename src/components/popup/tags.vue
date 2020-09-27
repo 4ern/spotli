@@ -1,6 +1,9 @@
 <template>
-  <div @click.stop="" class="tags">
+  <div @click.stop="" class="tag">
     <v-combobox
+        @keyup.enter="updateTag"
+        @keyup.tab="updateTag"
+        @keyup.esc="selectSearch"
         v-model="bm.tag"
         small-chips
         deletable-chips
@@ -8,8 +11,12 @@
         flat
         hide-details
         hide-no-data
-        append-icon="add_circle"
+        append-icon=""
         hide-selected >
+        <template v-slot:prepend-inner>
+          <v-icon small>mdi-tag-plus</v-icon>
+        </template>
+
         <template v-slot:selection="data">
           <v-chip
               :input-value="data.selected"
@@ -42,7 +49,8 @@ export default {
   },
 
   methods: {
-    updateTag() {
+    updateTag(e) {
+      e.stopPropagation();
       this.$store.commit("updateTags", this.bm );
     },
 
@@ -57,6 +65,10 @@ export default {
       input = input.replace(":url", "").trim();
       if (tag.toLowerCase().trim().includes(input)) return 'matched'
       return 'nomatch'
+    },
+
+    selectSearch() {
+      document.getElementById('searchInput').focus();
     }
   }
 };
@@ -68,9 +80,15 @@ export default {
   border: none;
 }
 
-//.v-input__append-inner {
-//  display: none !important;
-//}
+.v-application--is-ltr .v-text-field .v-input__prepend-inner {
+  align-self: center;
+}
+
+.v-input__prepend-inner {
+  .v-icon {
+    color: #757584;
+  }
+}
 
 .theme--dark {
   &.v-chip:not(.v-chip--active) {

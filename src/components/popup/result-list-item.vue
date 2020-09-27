@@ -1,94 +1,114 @@
 <template>
   <div>
-    <div
-      style="display: flex; gap: 12px; align-items: baseline; position: relative"
-    >
-      <img
-        :src="getFavicon(bookmark.url)"
-        alt="favicon"
-        style="max-height: 40px; align-self: center;"
-      />
+    <div v-show="!deleteBm" @click="preventClick">
+      <div
+          style="display: flex; gap: 12px; align-items: baseline; position: relative"
+      >
+        <!-- favicon -->
+        <img
+            :src="getFavicon(bookmark.url)"
+            alt="favicon"
+            style="max-height: 40px; align-self: center;"
+        />
 
-      <div style="flex: 1 1 auto; align-self: auto; min-width: 0;}">
-        <div>
-          <div
-            v-if="!edit"
-            class="title"
-            v-html="markSearchInput(bookmark.title)"
-          />
-          <label>
-            <input
-              @click.stop=""
-              ref="titleInput"
-              v-if="edit"
-              v-model="title"
-              type="text"
-              style="font-size: 16px"
+        <div style="flex: 1 1 auto; align-self: auto; min-width: 0;}">
+          <div>
+            <!-- title -->
+            <div
+                v-if="!edit"
+                class="title"
+                v-html="markSearchInput(bookmark.title)"
             />
-          </label>
+            <v-text-field
+                v-if="edit"
+                v-model="bookmark.title"
+                @focus="$event.target.select()"
+                autofocus
+                hide-details
+                outlined
+                flat
+                label="Title"
+            ></v-text-field>
+          </div>
+
+          <!-- url -->
+          <div>
+            <div
+                v-if="!edit"
+                class="url"
+                v-html="markSearchInput(bookmark.url)"
+            />
+            <v-text-field
+                v-if="edit"
+                v-model="bookmark.url"
+                @focus="$event.target.select()"
+                hide-details
+                outlined
+                flat
+                label="Url"
+                style="margin-top: 16px"
+            ></v-text-field>
+          </div>
         </div>
 
-        <div>
-          <div
-            v-if="!edit"
-            class="url"
-            v-html="markSearchInput(bookmark.url)"
-          />
-          <label>
-            <textarea @click.stop="" v-if="edit" v-model="url"></textarea>
-          </label>
+        <div class="actions">
+
+          <v-btn
+              icon
+              v-if="!edit"
+              @click.stop="edit = true">
+            <v-icon small>mdi-pencil</v-icon>
+          </v-btn>
+
+          <v-btn
+              icon
+              v-if="edit"
+              color="success"
+              @click.stop="saveBookmark(bookmark)">
+            <v-icon small>mdi-content-save</v-icon>
+          </v-btn>
+
+          <v-btn
+              icon
+              v-if="edit"
+              color="error"
+              @click.stop="deleteBm = true">
+            <v-icon small>mdi-delete</v-icon>
+          </v-btn>
+
+          <v-btn
+              icon
+              v-if="edit"
+              @click.stop="edit = false">
+            <v-icon small>mdi-close-circle</v-icon>
+          </v-btn>
+
         </div>
       </div>
-
-      <div class="actions">
-        <font-awesome-icon
-          v-if="!edit"
-          class="edit"
-          @click.stop="toggleEdit"
-          icon="edit"
-        />
-        <font-awesome-icon
-          v-if="!edit"
-          class="delete"
-          @click.stop="deleteBookmark"
-          icon="trash"
-        />
-        <font-awesome-icon
-          v-if="edit"
-          class="save"
-          @click.stop="editBookmark(bookmark)"
-          icon="save"
-        />
-        <font-awesome-icon
-          v-if="edit"
-          class="delete"
-          @click.stop="edit = false"
-          icon="times-circle"
-        />
-      </div>
+      <tags :bookmark="bookmark"/>
     </div>
 
-    <tags :bookmark="bookmark" />
+    <v-card v-show="deleteBm" class="mx-auto">
+      <v-card-text>
+        <div class="title">Do you really want to delete this bookmark?</div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn depressed color="error" @click.stop="deleteBookmark">YES</v-btn>
+        <v-btn depressed @click.stop="deleteBm = false" >NO</v-btn>
+      </v-card-actions>
+    </v-card>
+
   </div>
 </template>
 
 <script>
 import tags from "./tags";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-library.add(faTrash, faEdit, faSave, faTimesCircle);
 
 export default {
   props: ["bookmark"],
 
   components: {
-    tags,
-    FontAwesomeIcon
+    tags
   },
 
   computed: {
@@ -100,8 +120,7 @@ export default {
   data() {
     return {
       edit: false,
-      url: this.bookmark.url,
-      title: this.bookmark.title
+      deleteBm: false
     };
   },
 
@@ -111,32 +130,32 @@ export default {
     },
 
     markSearchInput(value) {
-      return value.replace(
-        this.searchInput,
-        `<mark>${this.searchInput}</mark>`
-      );
+      let pattern = new RegExp(this.searchInput, 'gi');
+      return value.replace(pattern, `<mark>${this.searchInput}</mark>`);
     },
 
-    toggleEdit() {
-      this.edit = !this.edit;
-      setTimeout(() => this.$refs.titleInput.focus(), 300);
-    },
-
-    editBookmark() {
-      this.bookmark.title = this.title;
-      this.bookmark.url = this.url;
-      this.$store.commit("editBookmark", this.bookmark);
+    saveBookmark() {
+      this.$store.commit("saveBookmark", this.bookmark);
       this.edit = false;
     },
 
     deleteBookmark() {
       this.$store.commit("deleteBookmark", this.bookmark.id);
+      this.deleteBm = false;
+    },
+
+    preventClick(e) {
+      if (this.edit) e.stopPropagation();
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+mark {
+  background-color: #E2FBFD;
+}
+
 .url {
   font-size: 12px;
   color: #757584;
@@ -144,23 +163,13 @@ export default {
 
 .actions {
   display: flex;
-  margin-left: auto;
-  gap: 8px;
-  text-align: right;
+  flex-direction: column;
 
   .delete {
     color: #757584;
 
     &:hover {
       color: #ff4e50;
-    }
-  }
-
-  .edit {
-    color: #757584;
-
-    &:hover {
-      color: #009daf;
     }
   }
 
@@ -173,19 +182,4 @@ export default {
   }
 }
 
-input,
-textarea {
-  background-color: transparent;
-  color: #e2fbfd;
-  font-size: 12px;
-  flex-grow: 1;
-  border: solid 1px #009daf;
-  padding: 8px;
-  width: calc(100% - 16px);
-  margin-bottom: 8px;
-
-  &:focus {
-    outline: none;
-  }
-}
 </style>

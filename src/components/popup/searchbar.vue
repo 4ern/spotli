@@ -1,16 +1,18 @@
 <template>
   <div class="searchbar-wrapper">
     <div class="searchbar">
-      <v-icon large style="padding: 0 8px;">search</v-icon>
+      <v-icon large style="padding: 0 8px;">mdi-magnify</v-icon>
 
       <input
         :value="searchInput"
         @input="updateSearchInput"
         type="text"
+        autocomplete="off"
         autofocus
+        id="searchInput"
         @keyup.enter="open"
       />
-      <span>{{ searchResults.length }} results</span>
+      <span class="text-caption">{{ searchResults.length }} results</span>
     </div>
   </div>
 </template>
@@ -54,13 +56,6 @@ export default {
     margin: 8px 0;
     align-items: center;
 
-    img {
-      padding: 8px;
-      height: 24px;
-      width: 24px;
-      margin-left: 8px;
-    }
-
     input {
       background-color: #303038;
       border: none;
@@ -76,7 +71,6 @@ export default {
     span {
       display: flex;
       margin-right: 16px;
-      border-radius: 50%;
       color: #94949e;
     }
   }

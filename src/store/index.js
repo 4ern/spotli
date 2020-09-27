@@ -113,15 +113,17 @@ export default new Vuex.Store({
       state.searchResults = state.searchResults.filter(
         bookmark => bookmark.id !== id
       );
+      chrome.bookmarks.removeTree(id)
     },
 
-    editBookmark(state, bookmark) {
+    saveBookmark(state, bookmark) {
       state.bookmarks = state.bookmarks.map(bm => {
         if (bm.id === bookmark.id) {
           return bookmark;
         }
         return bm;
       });
+      chrome.bookmarks.update(bookmark.id, {title: bookmark.title, url: bookmark.url})
     },
 
     saveBookmarks(state) {
