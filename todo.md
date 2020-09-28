@@ -1,2 +1,0 @@
-- [ ] Match Tags / keine Groß Klein Schreibung
-- [ ] suche mit mehreren tags
