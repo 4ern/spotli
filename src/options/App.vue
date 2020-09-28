@@ -1,15 +1,16 @@
 <template>
   <div>
     <v-app>
-      <v-app-bar app color="primary"  >
-        <div class="d-flex align-center">
-          <h4 class="text-h4">4ern-Spotly</h4>
-        </div>
-      </v-app-bar>
-
       <v-main>
 
         <v-container class="mt-10">
+
+          <div class="d-flex align-center">
+            <h4 class="text-h2">4ern-Spotly</h4>
+          </div>
+
+          <p class="title mb-8 mt-2">Thanks for installing 4ern-spotly.</p>
+
           <h4 class="text-h4 mb-2">Commands</h4>
           <v-simple-table>
             <template v-slot:default>
@@ -99,9 +100,9 @@ export default {
       focusTab: true,
       autoGoogle: true,
       matchTags: {
-        active: true,
-        select: ['test'],
-        items: ['test', 'sdfsdf']
+        active: false,
+        select: [],
+        items: []
       },
       commands: [
         {
