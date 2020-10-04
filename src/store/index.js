@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -170,7 +169,7 @@ export default new Vuex.Store({
     },
 
     search({ state, commit, getters }) {
-      if (state.searchInput <= 2) return (state.searchResults = []);
+      if (state.searchInput.length < 3) return (state.searchResults = []);
 
       /**
        * search by command

@@ -15,13 +15,6 @@ export default {
     resultsList
   },
 
-  data() {
-    return {
-      searchResults: [],
-      searchBarInfo: ""
-    };
-  },
-
   created() {
     this.$store.dispatch("loadBookmarks");
     this.$store.dispatch(("loadSettings"));
@@ -104,9 +97,6 @@ export default {
       this.$store.commit('updateOpenBookmark', false)
     },
 
-    /**
-     * Todo: Make optional
-     */
     reOpen(url) {
       return new Promise(resolve => {
         chrome.tabs.query({ url: url, active: false }, resp => {
