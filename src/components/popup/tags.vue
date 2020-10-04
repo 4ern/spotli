@@ -51,7 +51,7 @@ export default {
   methods: {
     updateTag(e) {
       if (typeof e !== 'undefined') e.stopPropagation();
-      this.bm.tag = this.bm.tag.map((tag) => tag.trim().split(' ').join('-'))
+      this.bm.tag = this.bm.tag.map((tag) => tag.trim().split(' ').join('-').toLowerCase())
       this.$store.commit("updateTags", this.bm );
     },
 

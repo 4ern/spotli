@@ -44,7 +44,7 @@ export default new Vuex.Store({
         let search = state.searchInput
           .replace(":tag", "")
           .trim()
-          .toLocaleLowerCase();
+          .toLowerCase();
         let hasTag = bookmark.tag.find(tag => {
           if (search.length === 0) return false;
           return tag.toLowerCase().includes(search);
@@ -212,7 +212,7 @@ export default new Vuex.Store({
       const searchByTitle = getters.searchResultsByTitle;
       const searchByUrl = getters.searchResultsByUrl;
       const searchByTag = getters.searchResultsByTag;
-      commit("searchByAll", [...searchByTitle, ...searchByUrl, ...searchByTag]);
+      commit("searchByAll", [...searchByTag, ...searchByTitle, ...searchByUrl]);
     },
 
   }
