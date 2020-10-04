@@ -1,4 +1,5 @@
 <template>
+
   <ul v-if="searchResults.length !== 0" class="search-results" @keyup.enter="open">
     <li
       v-for="(item, index) in searchResults"
@@ -90,6 +91,7 @@ export default {
   margin-top: 56px;
 
   li {
+    position: relative;
     padding: 16px;
     color: #ffffff;
     font-size: 16px;

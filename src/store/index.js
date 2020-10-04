@@ -45,13 +45,18 @@ export default new Vuex.Store({
           .replace(":tag", "")
           .trim()
           .toLowerCase();
+
         let hasTag = bookmark.tag.find(tag => {
           if (search.length === 0) return false;
-          return tag.toLowerCase().includes(search);
+          let found = false
+          search.split(' ').forEach((searchTag) => {
+            found = tag.toLowerCase().includes(searchTag);
+          })
+          return found;
         });
         return !!hasTag;
       });
-    }
+    },
   },
 
   mutations: {
@@ -85,7 +90,7 @@ export default new Vuex.Store({
 
     searchByAll(state, data) {
       state.searchResults = data.reduce((acc, current) => {
-        const x = acc.find(item => item.id === current.id);
+        const x = acc.find(item => item.url === current.url);
         return !x ? acc.concat([current]) : acc;
       }, []);
     },
@@ -131,7 +136,7 @@ export default new Vuex.Store({
 
     setSettings(state, settings) {
       state.settings = settings;
-    },
+    }
   },
 
   actions: {
@@ -151,6 +156,7 @@ export default new Vuex.Store({
         settings.matchTags = res.spotli_setting.matchTags;
         settings.markInput = res.spotli_setting.markInput;
         settings.highlightTag = res.spotli_setting.highlightTag;
+        settings.searchInTabs = res.spotli_setting.searchInTabs;
         commit('setSettings', settings)
 
         if (settings.matchTags.active) {
@@ -207,12 +213,43 @@ export default new Vuex.Store({
       }
 
       /**
-       * full search
+       * search in tabs
        */
-      const searchByTitle = getters.searchResultsByTitle;
-      const searchByUrl = getters.searchResultsByUrl;
-      const searchByTag = getters.searchResultsByTag;
-      commit("searchByAll", [...searchByTag, ...searchByTitle, ...searchByUrl]);
+      if (state.settings.searchInTabs) {
+        chrome.tabs.query({ currentWindow: true}, resp => {
+          let openTabs = resp.filter((tabs) => {
+            if (tabs.url.toLowerCase().includes(state.searchInput.toLowerCase())) return true;
+            return tabs.title.toLowerCase().includes(state.searchInput.toLowerCase());
+          }).map((tab) => {
+            return {
+              title: tab.title,
+              url: tab.url,
+              id: tab.id,
+              isBookmark: false
+            }
+          })
+
+          /**
+           * full search
+           */
+          const searchByTitle = getters.searchResultsByTitle;
+          const searchByUrl = getters.searchResultsByUrl;
+          const searchByTag = getters.searchResultsByTag;
+          commit("searchByAll", [...openTabs, ...searchByTag, ...searchByTitle, ...searchByUrl]);
+
+        });
+      } else {
+
+        /**
+         * full search
+         */
+        const searchByTitle = getters.searchResultsByTitle;
+        const searchByUrl = getters.searchResultsByUrl;
+        const searchByTag = getters.searchResultsByTag;
+        commit("searchByAll", [...searchByTag, ...searchByTitle, ...searchByUrl]);
+      }
+
+
     },
 
   }

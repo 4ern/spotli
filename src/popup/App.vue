@@ -109,7 +109,6 @@ export default {
           url: searchUrl,
           currentWindow: true
         }, resp => {
-          console.log(resp)
           if (resp.length > 0) {
             chrome.tabs.update(resp[0].id, { active: true });
             resolve(true);

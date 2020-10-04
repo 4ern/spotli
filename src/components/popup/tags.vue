@@ -62,10 +62,17 @@ export default {
 
     isSearchTag(tag) {
       if ( !this.$store.state.settings.highlightTag ) return 'nomatch';
+
       let input = this.searchInput.replace(":tag", "").trim();
       input = input.replace(":title", "").trim();
       input = input.replace(":url", "").trim();
-      if (tag.toLowerCase().trim().includes(input)) return 'matched'
+
+      let found = false;
+      input.split(' ').forEach((searhTag) => {
+        if (tag.toLowerCase().trim().includes(searhTag)) found = true;
+      })
+
+      if (found) return 'matched';
       return 'nomatch'
     },
 

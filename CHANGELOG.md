@@ -6,7 +6,9 @@
 - mark search input in title and url is now optional
 - highlight matched tag is now optional
 - youtube search command ":yt"
-- Result list is sorted first by tags, title and then by url
+- Result list is sorted first by tabs (if option is active), tags, title and last by url
+- it now possible search for several tags, separate by space
+- it is also possible to search the active tabs (not bookmarks)
 
 ### Bugfix
 - remove unused data attributes

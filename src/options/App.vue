@@ -81,6 +81,21 @@
           </v-row>
           <v-divider />
 
+          <!-- search in window tabs -->
+          <v-row>
+            <v-col cols="4">
+              <div >
+                <p class="text-body-1">
+                  searching for title & url in your tabs. only tabs in your active chrome window will be searched
+                </p>
+              </div>
+            </v-col>
+            <v-col cols="6" offset="2">
+              <v-switch v-model="searchInTabs" :label="searchInTabs ? 'search for tabs' : 'no please do not'"></v-switch>
+            </v-col>
+          </v-row>
+          <v-divider />
+
           <!-- highlight matched tag -->
           <v-row>
             <v-col cols="4">
@@ -134,6 +149,7 @@ export default {
       focusTab: false,
       autoGoogle: false,
       markInput: false,
+      searchInTabs: false,
       highlightTag: false,
       matchTags: {
         active: false,
@@ -182,6 +198,9 @@ export default {
     highlightTag() {
       this.save()
     },
+    searchInTabs() {
+      this.save()
+    },
     matchTags: {
       deep: true,
       handler() {
@@ -207,6 +226,7 @@ export default {
         autoGoogle: this.autoGoogle,
         markInput: this.markInput,
         highlightTag: this.highlightTag,
+        searchInTabs: this.searchInTabs,
         matchTags: {
           active: this.matchTags.active,
           select: this.matchTags.select

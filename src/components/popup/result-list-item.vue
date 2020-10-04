@@ -2,7 +2,7 @@
   <div>
     <div v-show="!deleteBm" @click="preventClick">
       <div
-          style="display: flex; gap: 12px; align-items: baseline; position: relative"
+          style="display: flex; gap: 12px; position: relative"
       >
         <!-- favicon -->
         <img
@@ -51,14 +51,21 @@
           </div>
         </div>
 
-        <div class="actions">
+        <div v-if="bookmark.isBookmark === undefined" class="actions">
 
-          <v-btn
-              icon
-              v-if="!edit"
-              @click.stop="edit = true">
-            <v-icon small>mdi-pencil</v-icon>
-          </v-btn>
+          <v-tooltip left color="#007C8A">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                  icon
+                  v-if="!edit"
+                  @click.stop="edit = true"
+                  v-bind="attrs"
+                  v-on="on">
+                <v-icon small>mdi-pencil</v-icon>
+              </v-btn>
+            </template>
+            <span>Edit Bookmark</span>
+          </v-tooltip>
 
           <v-btn
               icon
@@ -84,8 +91,21 @@
           </v-btn>
 
         </div>
+
+        <v-tooltip left v-else color="#007C8A">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+                style="margin-right: 0.4rem"
+                v-bind="attrs"
+                v-on="on">
+                mdi-application
+            </v-icon>
+          </template>
+          <span>tab</span>
+        </v-tooltip>
+
       </div>
-      <tags :bookmark="bookmark"/>
+      <tags v-if="bookmark.isBookmark === undefined" :bookmark="bookmark"/>
     </div>
 
     <v-card v-show="deleteBm" class="mx-auto">
@@ -94,7 +114,7 @@
       </v-card-text>
       <v-card-actions>
         <v-btn depressed color="error" @click.stop="deleteBookmark">YES</v-btn>
-        <v-btn depressed @click.stop="deleteBm = false" >NO</v-btn>
+        <v-btn depressed @click.stop="deleteBm = false">NO</v-btn>
       </v-card-actions>
     </v-card>
 
