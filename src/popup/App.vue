@@ -1,7 +1,7 @@
 <template>
   <v-app class="spotli">
     <searchbar @open="openBookmark"/>
-    <results-list ref="resultsList" @open="openBookmark"/>
+    <results-list @open="openBookmark"/>
   </v-app>
 </template>
 
@@ -39,10 +39,6 @@ export default {
       this.$store.dispatch("search");
     },
 
-    open() {
-      if (this.open) this.openBookmark();
-    },
-
     bookmarks() {
       this.$store.commit("saveBookmarks");
     }
@@ -62,6 +58,15 @@ export default {
           : this.$store.state.selected.url;
       const selected = this.$store.state.selected;
       const searchResult = this.$store.state.searchResults;
+
+      /**
+       * search youtube
+       */
+      if (this.open === ':yt') {
+        url = encodeURI(`https://www.youtube.com/results?search_query=${this.searchInput.replace(':yt', '').trim()}`);
+        this.$store.commit('updateOpenBookmark', false)
+        return chrome.tabs.create({ url: url });
+      }
 
       /**
        * search in google
@@ -98,8 +103,13 @@ export default {
     },
 
     reOpen(url) {
+      let searchUrl = url.split('#')[0] + '*'
       return new Promise(resolve => {
-        chrome.tabs.query({ url: url, active: false }, resp => {
+        chrome.tabs.query({
+          url: searchUrl,
+          currentWindow: true
+        }, resp => {
+          console.log(resp)
           if (resp.length > 0) {
             chrome.tabs.update(resp[0].id, { active: true });
             resolve(true);

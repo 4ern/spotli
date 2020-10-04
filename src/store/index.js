@@ -149,6 +149,8 @@ export default new Vuex.Store({
         settings.focusTab = res.spotli_setting.focusTab;
         settings.autoGoogle = res.spotli_setting.autoGoogle;
         settings.matchTags = res.spotli_setting.matchTags;
+        settings.markInput = res.spotli_setting.markInput;
+        settings.highlightTag = res.spotli_setting.highlightTag;
         commit('setSettings', settings)
 
         if (settings.matchTags.active) {
@@ -196,7 +198,11 @@ export default new Vuex.Store({
         }
 
         if (state.searchInput.startsWith(":g")) {
-          this.$store.commit('updateOpenBookmark', ':g');
+          commit('updateOpenBookmark', ':g');
+        }
+
+        if (state.searchInput.startsWith(":yt")) {
+          commit('updateOpenBookmark', ':yt');
         }
       }
 

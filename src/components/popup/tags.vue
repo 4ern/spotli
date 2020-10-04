@@ -50,7 +50,8 @@ export default {
 
   methods: {
     updateTag(e) {
-      e.stopPropagation();
+      if (typeof e !== 'undefined') e.stopPropagation();
+      this.bm.tag = this.bm.tag.map((tag) => tag.trim().split(' ').join('-'))
       this.$store.commit("updateTags", this.bm );
     },
 
@@ -60,6 +61,7 @@ export default {
     },
 
     isSearchTag(tag) {
+      if ( !this.$store.state.settings.highlightTag ) return 'nomatch';
       let input = this.searchInput.replace(":tag", "").trim();
       input = input.replace(":title", "").trim();
       input = input.replace(":url", "").trim();

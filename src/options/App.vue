@@ -11,6 +11,7 @@
 
           <p class="title mb-8 mt-2">Thanks for installing 4ern-spotly.</p>
 
+          <!--Commands-->
           <h4 class="text-h4 mb-2">Commands</h4>
           <v-simple-table>
             <template v-slot:default>
@@ -30,8 +31,11 @@
           </v-simple-table>
         </v-container>
 
+        <!-- Options -->
         <v-container class="mt-10">
           <h4 class="text-h4">Options</h4>
+
+          <!-- Check Open Tags -->
           <v-row>
             <v-col cols="4">
               <div >
@@ -45,9 +49,9 @@
               <v-switch v-model="focusTab" :label="focusTab ? 'check open Tab and focus' : 'always open new Tab'"></v-switch>
             </v-col>
           </v-row>
-
           <v-divider />
 
+          <!-- search with google -->
           <v-row>
             <v-col cols="4">
               <div >
@@ -60,9 +64,39 @@
               <v-switch v-model="autoGoogle" :label="autoGoogle ? 'google my input' : 'do nothing'"></v-switch>
             </v-col>
           </v-row>
-
           <v-divider />
 
+          <!-- mark search input -->
+          <v-row>
+            <v-col cols="4">
+              <div >
+                <p class="text-body-1">
+                  Mark the input in Title and Url
+                </p>
+              </div>
+            </v-col>
+            <v-col cols="6" offset="2">
+              <v-switch v-model="markInput" :label="markInput ? 'mark my input' : 'do not mark my input'"></v-switch>
+            </v-col>
+          </v-row>
+          <v-divider />
+
+          <!-- highlight matched tag -->
+          <v-row>
+            <v-col cols="4">
+              <div >
+                <p class="text-body-1">
+                  If your entry matches a tag, it will be highlighted
+                </p>
+              </div>
+            </v-col>
+            <v-col cols="6" offset="2">
+              <v-switch v-model="highlightTag" :label="highlightTag ? 'highlight matched Tag' : 'do not highlight'"></v-switch>
+            </v-col>
+          </v-row>
+          <v-divider />
+
+          <!-- auto match Tags -->
           <v-row>
             <v-col cols="4">
               <div >
@@ -97,8 +131,10 @@ export default {
 
   data() {
     return {
-      focusTab: true,
-      autoGoogle: true,
+      focusTab: false,
+      autoGoogle: false,
+      markInput: false,
+      highlightTag: false,
       matchTags: {
         active: false,
         select: [],
@@ -125,6 +161,10 @@ export default {
           command: '<code>:g</code>',
           desc: 'search in google'
         },
+        {
+          command: '<code>:yt</code>',
+          desc: 'search in youtube'
+        },
       ]
     }
   },
@@ -134,6 +174,12 @@ export default {
       this.save()
     },
     autoGoogle() {
+      this.save()
+    },
+    markInput() {
+      this.save()
+    },
+    highlightTag() {
       this.save()
     },
     matchTags: {
@@ -159,6 +205,8 @@ export default {
       const settings = {
         focusTab: this.focusTab,
         autoGoogle: this.autoGoogle,
+        markInput: this.markInput,
+        highlightTag: this.highlightTag,
         matchTags: {
           active: this.matchTags.active,
           select: this.matchTags.select

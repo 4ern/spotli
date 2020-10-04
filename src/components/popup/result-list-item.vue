@@ -130,8 +130,11 @@ export default {
     },
 
     markSearchInput(value) {
-      let pattern = new RegExp(this.searchInput, 'gi');
-      return value.replace(pattern, `<mark>${this.searchInput}</mark>`);
+      if (this.$store.state.settings.markInput) {
+        let pattern = new RegExp(this.searchInput, 'gi');
+        return value.replace(pattern, `<mark>${this.searchInput}</mark>`);
+      }
+      return value;
     },
 
     saveBookmark() {
