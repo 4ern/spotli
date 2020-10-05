@@ -73,7 +73,8 @@ export default {
 
     clickOnItem(item) {
       this.$store.commit("updateSelectedBookmark", item);
-      this.$store.commit("updateOpenBookmark", true);
+      this.$store.commit("updateCommand", item.id);
+      this.open();
     },
 
     open() {

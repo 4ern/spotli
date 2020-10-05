@@ -29,8 +29,8 @@ export default {
       return this.$store.state.searchInput;
     },
 
-    open() {
-      return this.$store.state.open;
+    command() {
+      return this.$store.state.command;
     }
   },
 
@@ -62,9 +62,9 @@ export default {
       /**
        * search youtube
        */
-      if (this.open === ':yt') {
+      if (this.command === ':yt') {
         url = encodeURI(`https://www.youtube.com/results?search_query=${this.searchInput.replace(':yt', '').trim()}`);
-        this.$store.commit('updateOpenBookmark', false)
+        this.$store.commit('updateCommand', false)
         return chrome.tabs.create({ url: url });
       }
 
@@ -72,9 +72,9 @@ export default {
        * search in google
        */
       if (this.$store.state.settings.autoGoogle) {
-        if ( (selected === null && searchResult.length === 0 ) || this.open === ':g') {
+        if ( (selected === null && searchResult.length === 0 ) || this.command === ':g') {
           url = encodeURI(`https://www.google.com/search?q=${this.searchInput.replace(':g', '').trim()}`);
-          this.$store.commit('updateOpenBookmark', false)
+          this.$store.commit('updateCommand', false)
           return chrome.tabs.create({ url: url });
         }
       }
@@ -99,7 +99,7 @@ export default {
       if (url !== null) {
         chrome.tabs.create({ url: url });
       }
-      this.$store.commit('updateOpenBookmark', false)
+      this.$store.commit('updateCommand', false)
     },
 
     reOpen(url) {

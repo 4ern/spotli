@@ -8,7 +8,7 @@ export default new Vuex.Store({
     searchInput: "",
     searchResults: [],
     selected: null,
-    open: false,
+    command: false,
     settings: {}
   },
 
@@ -60,8 +60,8 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    updateOpenBookmark(state, data) {
-      state.open = data;
+    updateCommand(state, data) {
+      state.command = data;
     },
 
     updateSelectedBookmark(state, item) {
@@ -204,11 +204,11 @@ export default new Vuex.Store({
         }
 
         if (state.searchInput.startsWith(":g")) {
-          commit('updateOpenBookmark', ':g');
+          commit('updateCommand', ':g');
         }
 
         if (state.searchInput.startsWith(":yt")) {
-          commit('updateOpenBookmark', ':yt');
+          commit('updateCommand', ':yt');
         }
       }
 
