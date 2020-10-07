@@ -1,7 +1,10 @@
 # Changelog
 
-## 0.2.0
+## 0.2.1
+### Bugfix
+- fix undefined property at the start of the options page
 
+## 0.2.0
 ### Features
 - mark search input in title and url is now optional
 - highlight matched tag is now optional

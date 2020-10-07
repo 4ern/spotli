@@ -211,6 +211,7 @@ export default {
 
   mounted() {
     chrome.storage.local.get(['spotli_setting'], (res) => {
+      if (typeof res.spotli_setting === 'undefined') return
       this.focusTab = res.spotli_setting.focusTab;
       this.autoGoogle = res.spotli_setting.autoGoogle;
       this.matchTags.active = res.spotli_setting.matchTags.active;
